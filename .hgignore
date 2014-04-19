@@ -1,0 +1,11 @@
+syntax: glob
+*.csv
+*.dat
+*.eps
+*.json
+*.o
+*.out
+*.pyc
+*.swp
+
+DHT22/read_dht

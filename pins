@@ -1,0 +1,31 @@
+This is just a cheatsheet for me to record wires and the BBB header to which
+they connect.
+
+On the power board:
+ -Y,Y,G tied with yellow tape:
+  --Y:  Solenoid (Doesn't matter which one).
+  --G:  P8, 12
+
+ -Bk,Bk,G tied with green tape:
+  --Bk: Solenoid (Doesn't matter which one).
+  --G:  P8, 14
+
+On the sensor board:
+ -R,Y,Bk,G tied with white tape:
+  --R:  VCC on luminosity sensor.
+  --Bk: GND on luminosity sensor.
+  --Y:  SDA on luminosity sensor.
+  --G:  SCL on luminosity sensor.
+
+ -R,Y,Bk tied with green tape:
+  --R:  VCC on temp/humidity sensor.
+  --Y:  P9, 27
+  --Bk: GND on temp/humidity sensor.
+
+ -O,G tied with yellow tape:
+  --G:  P9, 19
+  --O:  P9, 20
+
+ R,Bk tied with red tape:
+  --Bk: P9, 2
+  --R:  P9, 4

@@ -1,0 +1,6 @@
+Because their soil sensors aren't calibrated identically, allow each plant to
+water at different thresholds.
+
+Don't fail hard if logging FS isn't available.
+
+Start up scripts

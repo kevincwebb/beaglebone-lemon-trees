@@ -1,0 +1,12 @@
+Reads from the sensors every five minutes and logs the values to a file and to
+Google Fusion Tables.
+
+The code for interfacing with the DHT22 temperature/humidity sensor is in the
+DHT22 directory.  The sensor's timing requirements are tough to meet
+consistently from userspace, so it's a bit ugly, but it works.  It includes a
+library (Beagle_GPIO.[ch]) that I did not write.
+
+It uses Linux's tsl2563 driver to control a tsl2561 luminosity sensor.
+
+Run with --noauth_local_webserver to make sure fusion tables make.  Otherwise
+it will attempt to open a browser.
