@@ -68,7 +68,6 @@ class GoogleAPI(object):
                                                when.tm_min)
 
         query = "INSERT INTO %s (Date, Humidity, Temperature, Luminosity) VALUES ('%s', %.2f, %.2f, %d)" % (self.table_id, datestring, hum, temp, lux / 20000.0)
-        print query
 
         request = service.query().sql(sql=query)
         request.execute()

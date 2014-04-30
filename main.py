@@ -50,7 +50,7 @@ class Plant(object):
         util.set_gpio(self.soil, 'value', '1')
         readings = []
         for i in xrange(10):
-            time.sleep(0.05)
+            time.sleep(0.1)
             value = util.read_sys(self.ain)
             if value:
                 readings.append(value)
@@ -80,6 +80,7 @@ def main_loop(args):
 
         # Read soil moisture.
         a_raw, a_max = plant_a.sample()
+        time.sleep(0.5)
         b_raw, b_max = plant_b.sample()
 
         now = time.localtime()
@@ -89,7 +90,11 @@ def main_loop(args):
         log.write(now, 'A: %d (max %d), B: %d (max %d)\n' % (a_raw, a_max,
                                                              b_raw, b_max))
 
-        gft.push_update(now, hum, temp, lux)
+        try:
+            gft.push_update(now, hum, temp, lux)
+        except Exception as e:
+            print str(e)
+            log.write(now, 'GFTERROR: %s' % str(e))
 
         if a_max < args.water_threshold:
             plant_a.water(args.duration, log)
@@ -114,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output',
         help='Directory to use for logging output.  [stdout only.]')
     parser.add_argument('-t', '--test', default=False, dest='test',
-        action='store_true', help='Run a test of the sensors and solenoids.')
+        type=int, help='Run a test of the sensors and solenoids.')
     # TODO: Calibrate sensors and set this to a reasonable default.
     parser.add_argument('-w', '--water-threshold', default=0,
         dest='water_threshold', type=int,
@@ -126,6 +131,6 @@ if __name__ == '__main__':
         util.init()
 
     if args.test:
-        util.test()
+        util.test(args.test)
 
     main_loop(args)

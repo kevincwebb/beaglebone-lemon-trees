@@ -70,8 +70,23 @@ class Logfile(object):
         if self.logfile is not None:
             self.logfile.write(formatted)
 
+def invalid_hum_temp(hum, temp):
+    if hum < 0 or hum > 100:
+        return True
+
+    # In Celcius
+    if temp < 0 or temp > 50:
+        return True
+
+    return False
+
+
 def read_hum_temp():
+    attempts = 0
     hum, temp = check_output('DHT22/read_dht').split()
+    while (invalid_hum_temp(float(hum), float(temp)) and attempts < 10):
+        hum, temp = check_output('DHT22/read_dht').split()
+        attempts += 1
     return (float(hum), (float(temp) * (9.0 / 5.0)) + 32)
 
 def read_sys(filename, as_type=int):
@@ -126,9 +141,9 @@ def init():
     # Configure P8_16 (GPIO 46) for output to apply voltage to soil sensor.
     export_gpio(SOIL_B, 'out', '0')
 
-def test():
+def test(secs):
     print 'Testing temperature/humidity sensor...'
-    print '%s %% relative humidity, %.1f ºF' % read_hum_temp()
+    print '%s %% relative humidity, %.1 F' % read_hum_temp()
 
     print '\nTesting luminosity sensor...'
     lux = read_sys('/sys/bus/iio/devices/iio:device0/in_intensity_both_raw')
@@ -139,14 +154,14 @@ def test():
     print '\nTesting solenoids...'
     print '--Solenoid A, solo.'
     set_gpio(SOLENOID_A, 'value', '1')
-    time.sleep(4)
+    time.sleep(secs)
     set_gpio(SOLENOID_A, 'value', '0')
-    time.sleep(1)
+    time.sleep(2)
     print '--Solenoid B, solo.'
     set_gpio(SOLENOID_B, 'value', '1')
-    time.sleep(4)
+    time.sleep(secs)
     set_gpio(SOLENOID_B, 'value', '0')
-    time.sleep(1)
+    time.sleep(2)
     print '--Both solenoids together.'
     set_gpio(SOLENOID_A, 'value', '1')
     set_gpio(SOLENOID_B, 'value', '1')
