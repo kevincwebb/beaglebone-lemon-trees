@@ -54,28 +54,34 @@ class Logfile(object):
             return
 
         if self.last_rotated is None or self.last_rotated.tm_mday != n.tm_mday:
-            if self.logfile is not None:
-                self.logfile.close()
+            try:
+                if self.logfile is not None:
+                    self.logfile.close()
 
-            self.logfile = open('%s/%d-%02d-%02d' % (self.directory, n.tm_year,
+                self.logfile = open('%s/%d-%02d-%02d' % (self.directory, n.tm_year,
                                                  n.tm_mon, n.tm_mday), 'a', 1)
 
-            self.last_rotated = n
-            self.write(n, 'Opened log file: %s\n' % self.logfile.name)
+                self.last_rotated = n
+                self.write(n, 'Opened log file: %s\n' % self.logfile.name)
+            except Exception as e:
+                print 'Failed to rotate log file: %s' % str(e)
 
     def write(self, now, text):
         formatted = '%d:%02d %s' % (now.tm_hour, now.tm_min, text)
         print formatted
 
-        if self.logfile is not None:
-            self.logfile.write(formatted)
+        try:
+            if self.logfile is not None:
+                self.logfile.write(formatted)
+        except Exception as e:
+            print 'Failed to write to log file: %s' % str(e)
 
 def invalid_hum_temp(hum, temp):
-    if hum < 0 or hum > 100:
+    if hum <= 0 or hum > 100:
         return True
 
     # In Celcius
-    if temp < 0 or temp > 50:
+    if temp <= 0 or temp > 50:
         return True
 
     return False
@@ -87,6 +93,12 @@ def read_hum_temp():
     while (invalid_hum_temp(float(hum), float(temp)) and attempts < 10):
         hum, temp = check_output('DHT22/read_dht').split()
         attempts += 1
+
+    # Explicitly report 0's if the sensor isn't working.
+    if attempts > 9 or (int(float(hum)) == 0 and int(float(temp)) == 0):
+        print 'Check DHT!'
+        return (0.0, 0.0)
+
     return (float(hum), (float(temp) * (9.0 / 5.0)) + 32)
 
 def read_sys(filename, as_type=int):
@@ -141,9 +153,10 @@ def init():
     # Configure P8_16 (GPIO 46) for output to apply voltage to soil sensor.
     export_gpio(SOIL_B, 'out', '0')
 
-def test(secs):
+def test(arg):
+    seca, secb = map(int, arg.split(':'))
     print 'Testing temperature/humidity sensor...'
-    print '%s %% relative humidity, %.1 F' % read_hum_temp()
+    print '%s %% relative humidity, %s F' % read_hum_temp()
 
     print '\nTesting luminosity sensor...'
     lux = read_sys('/sys/bus/iio/devices/iio:device0/in_intensity_both_raw')
@@ -152,14 +165,14 @@ def test(secs):
     print '\nTesting soil moisture sensors...'
 
     print '\nTesting solenoids...'
-    print '--Solenoid A, solo.'
+    print '--Solenoid A, solo. (%d seconds)' % seca
     set_gpio(SOLENOID_A, 'value', '1')
-    time.sleep(secs)
+    time.sleep(seca)
     set_gpio(SOLENOID_A, 'value', '0')
     time.sleep(2)
-    print '--Solenoid B, solo.'
+    print '--Solenoid B, solo. (%d seconds)' % secb
     set_gpio(SOLENOID_B, 'value', '1')
-    time.sleep(secs)
+    time.sleep(secb)
     set_gpio(SOLENOID_B, 'value', '0')
     time.sleep(2)
     print '--Both solenoids together.'

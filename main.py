@@ -119,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output',
         help='Directory to use for logging output.  [stdout only.]')
     parser.add_argument('-t', '--test', default=False, dest='test',
-        type=int, help='Run a test of the sensors and solenoids.')
+        help='Run a test of the sensors and solenoids. Format: N:M, seconds for each solenoid.')
     # TODO: Calibrate sensors and set this to a reasonable default.
     parser.add_argument('-w', '--water-threshold', default=0,
         dest='water_threshold', type=int,

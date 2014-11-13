@@ -190,6 +190,16 @@ int main(int argc, char **argv) {
             printf("%d bits\n", bit_count);
         }
 
+        /* Detect disconnected sensor and bail out early.*/
+        if (bit_count == 0) {
+            if (verbose) {
+                printf("Failed to read any data.  Sensor disconnected?\n");
+            } else {
+                printf("0.0 0.0\n");
+            }
+            break;
+        }
+
         /* We need at least 40 bits.  If we didn't get 40, something went
          * wrong, so we'll try again on the next attempt. */
         if (bit_count < 40) {
@@ -244,6 +254,16 @@ int main(int argc, char **argv) {
                 printf("--Bad checksum (%d attempts)\n", attempts);
             }
             bit_count -= 1;
+        }
+
+        if (attempts >= 20) {
+            /* If we fail too many times, bail out. */
+            if (verbose) {
+                printf("Failed to get a reading after too many attempts.\n");
+            } else {
+                printf("0.0 0.0\n");
+            }
+            break;
         }
     }
 
