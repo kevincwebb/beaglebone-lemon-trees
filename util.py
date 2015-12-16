@@ -154,7 +154,6 @@ def init():
     export_gpio(SOIL_B, 'out', '0')
 
 def test(arg):
-    seca, secb = map(int, arg.split(':'))
     print 'Testing temperature/humidity sensor...'
     print '%s %% relative humidity, %s F' % read_hum_temp()
 
@@ -164,23 +163,33 @@ def test(arg):
 
     print '\nTesting soil moisture sensors...'
 
-    print '\nTesting solenoids...'
-    print '--Solenoid A, solo. (%d seconds)' % seca
-    set_gpio(SOLENOID_A, 'value', '1')
-    time.sleep(seca)
-    set_gpio(SOLENOID_A, 'value', '0')
-    time.sleep(2)
-    print '--Solenoid B, solo. (%d seconds)' % secb
-    set_gpio(SOLENOID_B, 'value', '1')
-    time.sleep(secb)
-    set_gpio(SOLENOID_B, 'value', '0')
-    time.sleep(2)
-    print '--Both solenoids together.'
-    set_gpio(SOLENOID_A, 'value', '1')
-    set_gpio(SOLENOID_B, 'value', '1')
-    time.sleep(2)
-    set_gpio(SOLENOID_A, 'value', '0')
-    set_gpio(SOLENOID_B, 'value', '0')
+    if ':' in arg:
+        seca, secb = map(int, arg.split(':'))
+        print '\nTesting solenoids...'
+        print '--Solenoid A, solo. (%d seconds)' % seca
+        set_gpio(SOLENOID_A, 'value', '1')
+        time.sleep(seca)
+        set_gpio(SOLENOID_A, 'value', '0')
+        time.sleep(2)
+        print '--Solenoid B, solo. (%d seconds)' % secb
+        set_gpio(SOLENOID_B, 'value', '1')
+        time.sleep(secb)
+        set_gpio(SOLENOID_B, 'value', '0')
+        time.sleep(2)
+        print '--Both solenoids together.'
+        set_gpio(SOLENOID_A, 'value', '1')
+        set_gpio(SOLENOID_B, 'value', '1')
+        time.sleep(2)
+        set_gpio(SOLENOID_A, 'value', '0')
+        set_gpio(SOLENOID_B, 'value', '0')
+    else:
+        sec = int(arg)
+        print '--Both solenoids together.'
+        set_gpio(SOLENOID_A, 'value', '1')
+        set_gpio(SOLENOID_B, 'value', '1')
+        time.sleep(sec)
+        set_gpio(SOLENOID_A, 'value', '0')
+        set_gpio(SOLENOID_B, 'value', '0')
 
     print '\nTest complete!'
     sys.exit(0)
